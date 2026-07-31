@@ -1,6 +1,6 @@
 # sign-pbo
 
-**v1.1.1**
+**v1.1.3**
 
 A small Python utility that signs DayZ PBOs with a stable authority name,
 producing a `.bisign` file that satisfies `verifySignatures=2` on a DayZ
@@ -22,7 +22,7 @@ expects.
 No PyPI release yet, so install directly from the tagged GitHub archive:
 
 ```bash
-pip install https://github.com/bearmeister/sign-pbo/archive/refs/tags/v1.1.1.zip
+pip install https://github.com/bearmeister/sign-pbo/archive/refs/tags/v1.1.3.zip
 ```
 
 Works on any environment with `pip` and Python 3.10+; no `git` binary
@@ -31,7 +31,7 @@ required. Pulls in `cryptography` automatically.
 If you already have `git` installed:
 
 ```bash
-pip install git+https://github.com/bearmeister/sign-pbo@v1.1.1
+pip install git+https://github.com/bearmeister/sign-pbo@v1.1.3
 ```
 
 Or from a local clone:

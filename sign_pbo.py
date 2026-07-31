@@ -1,6 +1,6 @@
 # Author:   Bushy <contact@bushy.dev>
-# Version:  v1.1.1
-# Modified: 2026-05-14
+# Version:  v1.1.3
+# Modified: 2026-08-01
 #
 # sign_pbo.py: sign a hemtt-built PBO with a stable authority name.
 # Algorithm derived from hemtt/libs/signing (BrettMayson/HEMTT, GPLv2).
@@ -47,9 +47,9 @@ def _load_or_generate_key(key_path: Path) -> tuple[int, int, int, int]:
     """Return (n, e, d, key_bits).
 
     Accepts three key sources (checked in order):
-    1. <key_path> with .biprivatekey suffix: RSA2 CRT format (DS utils)
-    2. <key_path> with .privatekey suffix: this script's own compact format
-    3. Neither exists: generate a new key and save as .privatekey
+    1. <key_path> with .biprivatekey suffix  - RSA2 CRT format (DS utils)
+    2. <key_path> with .privatekey suffix    - this script's own compact format
+    3. Neither exists                        - generate a new key and save as .privatekey
 
     The caller should pass the .privatekey path; for .biprivatekey pass that path directly.
     """
@@ -117,7 +117,7 @@ def write_bikey(authority: str, n: int, e: int, key_bits: int) -> bytes:
 
 
 # ---------------------------------------------------------------------------
-# PBO parsing: extract the data needed for the three hashes
+# PBO parsing - extract the data needed for the three hashes
 # ---------------------------------------------------------------------------
 
 def _read_cstring(data: bytes, offset: int) -> tuple[str, int]:
@@ -149,7 +149,7 @@ def parse_pbo(pbo_bytes: bytes) -> tuple[dict, list[PboFile], bytes]:
     # reserved, timestamp, data_size. Special 'vers' entry first.
     header_start = 0
 
-    # First entry filename: for the vers header it's empty
+    # First entry filename - for the vers header it's empty
     first_filename, offset = _read_cstring(pbo_bytes, offset)
 
     # If first entry is vers entry (empty filename, packing=0x56657273)
@@ -166,7 +166,7 @@ def parse_pbo(pbo_bytes: bytes) -> tuple[dict, list[PboFile], bytes]:
             value, offset = _read_cstring(pbo_bytes, offset)
             properties[key] = value
     else:
-        # No vers header: put back the first entry
+        # No vers header - put back the first entry
         # (we already consumed filename + packing method)
         orig_size, offset = _read_u32(pbo_bytes, offset)
         _reserved, offset = _read_u32(pbo_bytes, offset)
@@ -209,7 +209,7 @@ def _file_data(pbo_bytes: bytes, f: PboFile) -> bytes:
 
 
 # ---------------------------------------------------------------------------
-# gen_checksum: SHA-1 over PBO headers + file data (sorted)
+# gen_checksum - SHA-1 over PBO headers + file data (sorted)
 # ---------------------------------------------------------------------------
 
 def gen_checksum(properties: dict, files: list[PboFile],
@@ -220,7 +220,7 @@ def gen_checksum(properties: dict, files: list[PboFile],
     # then SHA-1(buffer + all file data in sorted order).
     #
     # Since we already have raw_headers from the actual PBO which was built
-    # by hemtt, we can use those directly: they ARE the correct header bytes.
+    # by hemtt, we can use those directly - they ARE the correct header bytes.
     hasher = hashlib.sha1()
     hasher.update(raw_headers)
     for f in sorted(files, key=lambda x: x.filename.lower()):
@@ -241,8 +241,8 @@ def hash_filenames(files: list[PboFile], pbo_bytes: bytes) -> bytes:
 
 
 # V3 extension whitelist.
-# Arma 3 / hemtt omit .c: DayZ engine and DS utils include it (EnforceScript).
-# Missing .c causes hash3 mismatch → engine kicks clients at verifySignatures=2.
+# Arma 3 / hemtt omit .c - DayZ engine and DS utils include it (EnforceScript).
+# Missing .c causes hash3 mismatch -> engine kicks clients at verifySignatures=2.
 _V3_EXTS = {'.bikb', '.c', '.cfg', '.ext', '.fsm', '.h', '.hpp',
             '.inc', '.sqf', '.sqfc', '.sqm', '.sqs'}
 
@@ -327,7 +327,7 @@ def sign(pbo_path: Path, authority: str, key_dir: Path) -> None:
     # Write bikey
     bikey_data = write_bikey(authority, n, e, key_bits)
     bikey_path.write_bytes(bikey_data)
-    print(f'bikey   → {bikey_path}  ({len(bikey_data)} bytes)')
+    print(f'bikey   -> {bikey_path}  ({len(bikey_data)} bytes)')
 
     # Parse PBO
     pbo_bytes = pbo_path.read_bytes()
@@ -368,7 +368,7 @@ def sign(pbo_path: Path, authority: str, key_dir: Path) -> None:
     bisign_data = write_bisign(authority, n, e, key_bits, sig1, sig2, sig3)
     bisign_path = pbo_path.parent / f'{pbo_path.name}.{authority}.bisign'
     bisign_path.write_bytes(bisign_data)
-    print(f'bisign  → {bisign_path}  ({len(bisign_data)} bytes)')
+    print(f'bisign  -> {bisign_path}  ({len(bisign_data)} bytes)')
 
 
 def main() -> None:
